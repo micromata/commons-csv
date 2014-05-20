@@ -61,7 +61,7 @@ public class CSVFormatTest {
         CSVFormat.DEFAULT.withDelimiter('!').withEscape('!').validate();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testDuplicateHeaderElements() {
         CSVFormat.DEFAULT.withHeader("A", "A").validate();
     }
@@ -192,6 +192,41 @@ public class CSVFormatTest {
                 .withQuotePolicy(Quote.ALL);
         final CSVFormat left = right
                 .withRecordSeparator('!');
+
+        assertNotEquals(right, left);
+    }
+
+    @Test
+    public void testEqualsNullString() {
+        final CSVFormat right = CSVFormat.newFormat('\'')
+                .withRecordSeparator('*')
+                .withCommentStart('#')
+                .withEscape('+')
+                .withIgnoreEmptyLines(true)
+                .withIgnoreSurroundingSpaces(true)
+                .withQuoteChar('"')
+                .withQuotePolicy(Quote.ALL)
+                .withNullString("null");
+        final CSVFormat left = right
+                .withNullString("---");
+
+        assertNotEquals(right, left);
+    }
+
+    @Test
+    public void testEqualsSkipHeaderRecord() {
+        final CSVFormat right = CSVFormat.newFormat('\'')
+                .withRecordSeparator('*')
+                .withCommentStart('#')
+                .withEscape('+')
+                .withIgnoreEmptyLines(true)
+                .withIgnoreSurroundingSpaces(true)
+                .withQuoteChar('"')
+                .withQuotePolicy(Quote.ALL)
+                .withNullString("null")
+                .withSkipHeaderRecord(true);
+        final CSVFormat left = right
+                .withSkipHeaderRecord(false);
 
         assertNotEquals(right, left);
     }

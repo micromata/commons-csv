@@ -155,7 +155,7 @@ public final class CSVFormat implements Serializable {
     private final boolean ignoreEmptyLines;
     private final String recordSeparator; // for outputs
     private final String nullString; // the string to be used for null values
-    private final String[] header;
+    private final String[] header; // array of header column names
     private final boolean skipHeaderRecord;
 
     /**
@@ -293,8 +293,7 @@ public final class CSVFormat implements Serializable {
      * @param skipHeaderRecord TODO
      * @throws IllegalArgumentException if the delimiter is a line break character
      */
-    // package protected to give access without needing a synthetic accessor
-    CSVFormat(final char delimiter, final Character quoteChar,
+    private CSVFormat(final char delimiter, final Character quoteChar,
             final Quote quotePolicy, final Character commentStart,
             final Character escape, final boolean ignoreSurroundingSpaces,
             final boolean ignoreEmptyLines, final String recordSeparator,
@@ -311,7 +310,17 @@ public final class CSVFormat implements Serializable {
         this.ignoreEmptyLines = ignoreEmptyLines;
         this.recordSeparator = recordSeparator;
         this.nullString = nullString;
-        this.header = header == null ? null : header.clone();
+        if (header == null) {
+            this.header = null;
+        } else {
+            Set<String> dupCheck = new HashSet<String>();
+            for(String hdr : header) {
+                if (!dupCheck.add(hdr)) {
+                    throw new IllegalArgumentException("The header contains a duplicate entry: '" + hdr + "' in " + Arrays.toString(header));
+                }
+            }
+            this.header = header.clone();
+        }
         this.skipHeaderRecord = skipHeaderRecord;
     }
 
@@ -355,6 +364,13 @@ public final class CSVFormat implements Serializable {
         } else if (!escape.equals(other.escape)) {
             return false;
         }
+        if (nullString == null) {
+            if (other.nullString != null) {
+                return false;
+            }
+        } else if (!nullString.equals(other.nullString)) {
+            return false;
+        }
         if (!Arrays.equals(header, other.header)) {
             return false;
         }
@@ -362,6 +378,9 @@ public final class CSVFormat implements Serializable {
             return false;
         }
         if (ignoreEmptyLines != other.ignoreEmptyLines) {
+            return false;
+        }
+        if (skipHeaderRecord != other.skipHeaderRecord) {
             return false;
         }
         if (recordSeparator == null) {
@@ -422,7 +441,7 @@ public final class CSVFormat implements Serializable {
     /**
      * Returns a copy of the header array.
      *
-     * @return a copy of the header array
+     * @return a copy of the header array; {@code null} if disabled, the empty array if to be read from the file
      */
     public String[] getHeader() {
         return header != null ? header.clone() : null;
@@ -512,8 +531,10 @@ public final class CSVFormat implements Serializable {
         result = prime * result + ((quoteChar == null) ? 0 : quoteChar.hashCode());
         result = prime * result + ((commentStart == null) ? 0 : commentStart.hashCode());
         result = prime * result + ((escape == null) ? 0 : escape.hashCode());
+        result = prime * result + ((nullString == null) ? 0 : nullString.hashCode());
         result = prime * result + (ignoreSurroundingSpaces ? 1231 : 1237);
         result = prime * result + (ignoreEmptyLines ? 1231 : 1237);
+        result = prime * result + (skipHeaderRecord ? 1231 : 1237);
         result = prime * result + ((recordSeparator == null) ? 0 : recordSeparator.hashCode());
         result = prime * result + Arrays.hashCode(header);
         return result;
@@ -647,13 +668,6 @@ public final class CSVFormat implements Serializable {
             throw new IllegalStateException("No quotes mode set but no escape character is set");
         }
 
-        if (header != null) {
-            final Set<String> set = new HashSet<String>(header.length);
-            set.addAll(Arrays.asList(header));
-            if (set.size() != header.length) {
-                throw new IllegalStateException("The header contains duplicate names: " + Arrays.toString(header));
-            }
-        }
     }
 
     /**

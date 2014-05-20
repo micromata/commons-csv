@@ -17,8 +17,6 @@
 
 package org.apache.commons.csv;
 
-import static org.apache.commons.csv.Token.Type.TOKEN;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
@@ -36,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import static org.apache.commons.csv.Token.Type.TOKEN;
 
 /**
  * Parses CSV files according to the specified format.
@@ -135,6 +135,11 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
     /**
      * Creates a parser for the given {@link File}.
      *
+     * <p><strong>Note:</strong> This method internally creates a FileReader using
+     * {@link FileReader#FileReader(java.io.File)} which in turn relies on the default encoding of the JVM that
+     * is executing the code. If this is insufficient create a URL to the file and use
+     * {@link #parse(URL, Charset, CSVFormat)}</p>
+     *
      * @param file
      *            a CSV file. Must not be null.
      * @param format
@@ -231,7 +236,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
      * @throws IllegalArgumentException
      *             If the parameters of the format are inconsistent or if either reader or format are null.
      * @throws IOException
-     *             If an I/O error occurs
+     *             If there is a problem reading the header or skipping the first record
      */
     public CSVParser(final Reader reader, final CSVFormat format) throws IOException {
         Assertions.notNull(reader, "reader");
@@ -347,6 +352,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
      * Initializes the name to index mapping if the format defines a header.
      *
      * @return null if the format has no header.
+     * @throws IOException if there is a problem reading the header or skipping the first record
      */
     private Map<String, Integer> initializeHeader() throws IOException {
         Map<String, Integer> hdrMap = null;
@@ -371,9 +377,13 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
             // build the name to index mappings
             if (header != null) {
                 for (int i = 0; i < header.length; i++) {
+                    // skip the header when it is empty
+                    if(header[i] == null || "".equals(header[i])) {
+                      continue;
+                    }
                     if (hdrMap.containsKey(header[i])) {
-                        throw new IllegalStateException("The header contains duplicate names: "
-                                + Arrays.toString(header));
+                        throw new IllegalArgumentException("The header contains duplicate names: " +
+                                Arrays.toString(header));
                     }
                     hdrMap.put(header[i], Integer.valueOf(i));
                 }
