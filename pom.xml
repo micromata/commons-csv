@@ -25,7 +25,7 @@ limitations under the License.
   </parent>
   <groupId>org.apache.commons</groupId>
   <artifactId>commons-csv</artifactId>
-  <version>MICROMATA-1.1</version>
+  <version>MICROMATA-1.2</version>
   <name>Apache Commons CSV</name>
   <url>http://commons.apache.org/proper/commons-csv/</url>
   <description>
