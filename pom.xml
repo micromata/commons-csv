@@ -112,14 +112,19 @@ CSV files of various types.
     <url>http://issues.apache.org/jira/browse/CSV</url>
   </issueManagement>
 
- <distributionManagement>
-        <repository>
-            <id>vls-releases</id>
-            <name>DHL-VLS releases repository</name>
-            <url>http://repo.micromata.priv:8081/nexus/content/repositories/dhl-vls</url>
-            <uniqueVersion>true</uniqueVersion>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>dhl-common-releases</id>
+			<name>common-releases</name>
+			<url>http://repo.micromata.priv:8081/nexus/content/repositories/dhl-common</url>
+		</repository>
+		<snapshotRepository>
+			<id>dhl-common-snapshot-deploy</id>
+			<name>common-snapshots</name>
+			<url>http://repo.micromata.priv:8081/nexus/content/repositories/dhl-common-snapshot/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
 
   <properties>
     <commons.release.version>1.0</commons.release.version>
