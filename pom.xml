@@ -114,14 +114,14 @@ CSV files of various types.
 
 	<distributionManagement>
 		<repository>
-			<id>dhl-common-releases</id>
-			<name>common-releases</name>
-			<url>http://repo.micromata.priv:8081/nexus/content/repositories/dhl-common</url>
+			<id>micromata</id>
+			<name>ulib-release</name>
+			<url>https://repo.micromata.de/nexus/content/repositories/ulib-release/</url>
 		</repository>
 		<snapshotRepository>
-			<id>dhl-common-snapshot-deploy</id>
-			<name>common-snapshots</name>
-			<url>http://repo.micromata.priv:8081/nexus/content/repositories/dhl-common-snapshot/</url>
+			<id>ulib-snapshot</id>
+			<name>ulib-snapshot</name>
+			<url>https://repo.micromata.de/nexus/content/repositories/ulib-snapshot/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
